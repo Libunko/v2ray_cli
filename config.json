@@ -1,0 +1,93 @@
+{
+    "log": {
+        "loglevel": "none"
+    },
+    "dns": {
+        "servers": [
+            "1.1.1.1",
+            "8.8.8.8"
+        ]
+    },
+    "stats": {},
+    "routing": {
+        "domainStrategy": "IPIfNonMatch",
+        "rules": [
+            {
+                "type": "field",
+                "ip": [
+                    "geoip:private"
+                ],
+                "outboundTag": "direct"
+            },
+            {
+                "type": "field",
+                "ip": [
+                    "geoip:cn"
+                ],
+                "outboundTag": "direct"
+            },
+            {
+                "domain": [
+                    "geosite:cn"
+                ],
+                "outboundTag": "direct",
+                "type": "field"
+            }
+        ]
+    },
+    "policy": {
+        "levels": {
+            "8": {
+                "handshake": 4,
+                "connIdle": 300,
+                "downlinkOnly": 0,
+                "uplinkOnly": 0
+            }
+        },
+        "system": {
+            "statsInboundUplink": true,
+            "statsInboundDownlink": true
+        }
+    },
+    "inbounds": [
+        {
+            "port": 10809,
+            "protocol": "http",
+            "settings": {
+                "userLevel": 8
+            },
+            "tag": "http"
+        }
+    ],
+    "outbounds": [
+        {
+            "protocol": "vmess",
+            "settings": {
+                "vnext": [
+                    {
+                        "address": "v2ray.com",
+                        "port": 443,
+                        "users": [
+                            {
+                                "alterId": 2,
+                                "id": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeee",
+                                "level": 8,
+                                "security": "auto"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "tag": "proxy",
+            "streamSettings": {
+                "network": "tcp",
+                "security": "",
+                "tlssettings": {},
+                "wssettings": {}
+            },
+            "mux": {
+                "enabled": false
+            }
+        }
+    ]
+}
