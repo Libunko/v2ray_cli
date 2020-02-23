@@ -1,20 +1,23 @@
 #! /usr/bin/python3
 
 import os
+import configparser
 from subscribe import Subscribe
 
-url_pathname = "./url.txt"
-conf_pathname = "./config.json"
+cfg_pathname = "./cfg.conf"
+json_template_pathname = "./config.json.template"
 
 if __name__ == "__main__":
-    if os.path.exists(url_pathname):
-        with open(url_pathname, "r") as f:
-            url = f.read()
-    else:
-        url = input("Please Enter The Subscription Aadress: ")
-        
-        with open(url_pathname, "w") as f:
-            f.write(url)
+    cfg = configparser.ConfigParser()
+    cfg.read(cfg_pathname, encoding='UTF-8')
 
-    sub = Subscribe(url, conf_pathname)
+    if cfg["subscribe"]["url"] == "":
+        url = input("Please Enter The Subscription Aadress: ")
+        cfg["subscribe"] = {"url": url}
+        with open(cfg_pathname, 'w') as cfg_file:
+            cfg.write(cfg_file)
+    else:
+        url = cfg["subscribe"]["url"]
+        
+    sub = Subscribe(url, json_template_pathname)
     

@@ -4,11 +4,12 @@ import json
 import os
 
 class Subscribe(object):
-    def __init__(self, url, conf_pathname):
+    def __init__(self, url, json_template_pathname):
         self.__url = url    # 订阅链接
         self.__source = {}  # 订阅的各节点
         self.__node = {}    # 订阅的各节点名称
-        self.__conf_pathname = conf_pathname
+        self.__json_template_pathname = json_template_pathname
+        self.__json_conf_pathname = "./config.json"
         self.update()
 
     def update(self):
@@ -62,7 +63,7 @@ class Subscribe(object):
         # print(sub)
 
         try:
-            with open(self.__conf_pathname, "r") as f:
+            with open(self.__json_template_pathname, "r") as f:
                 conf = json.load(f)
         except FileNotFoundError:
             print("miss file: config.json")
@@ -97,7 +98,7 @@ class Subscribe(object):
                 conf["outbounds"][index]["streamSettings"]["wssettings"] = {}
 
         try:
-            with open(self.__conf_pathname, "w") as f:
+            with open(self.__json_conf_pathname, "w") as f:
                 f.write(json.dumps(conf, indent=4))
             print("Node Configure Write File OK")
         except Exception:
