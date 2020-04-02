@@ -75,9 +75,9 @@ class Subscribe(object):
         
         if protocol == "vmess":
             conf["outbounds"][index]["settings"]["vnext"][-1]["address"] = sub["add"]
-            conf["outbounds"][index]["settings"]["vnext"][-1]["port"] = sub["port"]
+            conf["outbounds"][index]["settings"]["vnext"][-1]["port"] = int(sub["port"])
             conf["outbounds"][index]["settings"]["vnext"][-1]["users"][-1]["id"] = sub["id"]
-            conf["outbounds"][index]["settings"]["vnext"][-1]["users"][-1]["alterId"] = sub["aid"]
+            conf["outbounds"][index]["settings"]["vnext"][-1]["users"][-1]["alterId"] = int(sub["aid"])
             conf["outbounds"][index]["streamSettings"]["network"] = sub["net"]
 
             conf["outbounds"][index]["streamSettings"]["security"] = sub["tls"]
