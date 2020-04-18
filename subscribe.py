@@ -2,6 +2,7 @@ import base64
 import requests
 import json
 import os
+import ast
 
 class Subscribe(object):
     def __init__(self, url, json_template_pathname):
@@ -33,8 +34,13 @@ class Subscribe(object):
             item_source = subs[-1][1]
 
             if item_protocol == "vmess":
-                ret = eval(base64.b64decode(item_source))
-                self.__source[ret["ps"]] = ret
+                try:
+                    item_source_b = base64.b64decode(item_source)
+                    ret = ast.literal_eval(item_source_b.decode("UTF-8"))
+                    self.__source[ret["ps"]] = ret
+                except ValueError as e:
+                    print("ValueError: %s" % e)
+                    pass
             else:
                 print("%s not support" % item_protocol)
         
