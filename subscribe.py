@@ -57,12 +57,12 @@ class Subscribe(object):
         num = 0
         print("num\tnode")
         for item in self.__source.keys():
-            print("%d\t%s" % (num, item))
+            print("%d\t%s" % (num,item.encode('utf-16', 'surrogatepass').decode('utf-16')))
             self.__node[str(num)] = item
             num += 1
 
     def sub2conf(self, name, protocol):
-        print("Node Selected: %s" % name)
+        print("Node Selected: %s" % name.encode('utf-16', 'surrogatepass').decode('utf-16'))
         sub = self.__source[name]
 
         # debug sub
