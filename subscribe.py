@@ -4,6 +4,7 @@ import json
 import os
 import ast
 
+
 class Subscribe(object):
     def __init__(self, url, json_template_pathname):
         self.__url = url    # 订阅链接
@@ -22,10 +23,9 @@ class Subscribe(object):
         except ConnectionError:
             print("Connection Error")
             return
-        
-            
-        all_subs = base64.b64decode(ret.text + '==').decode().strip().split("\n")
-        
+
+        all_subs = base64.b64decode(ret.text).decode().strip().split("\n")
+
         for item in all_subs:
             subs = []
             subs.append(item.split("://"))
@@ -35,35 +35,36 @@ class Subscribe(object):
 
             if item_protocol == "vmess":
                 try:
-                    item_source_b = base64.b64decode(item_source)
-                    ret = ast.literal_eval(item_source_b.decode("UTF-8"))
-                    self.__source[ret["ps"]] = ret
+                    item_source_bytes = base64.b64decode(item_source)
+                    item_node = json.loads(item_source_bytes.decode("utf-8"))
+                    self.__source[item_node["ps"]] = item_node
                 except ValueError as e:
                     print("ValueError: %s" % e)
                     pass
             else:
                 print("%s not support" % item_protocol)
-        
+
         while (1):
             try:
                 self.show()
                 num = input("Please Enter Node Num:")
-                self.sub2conf(self.__node[num], item_protocol)
+                self.sub2conf(self.__node[num], "vmess")
                 break
             except KeyError as e:
-                print("%s: %s" % ("Out Of Node Range" , e))
+                print("%s: %s" % ("Out Of Node Range", e))
 
     def show(self):
         num = 0
         print("num\tnode")
         for item in self.__source.keys():
-            print("%d\t%s" % (num,item.encode('utf-16', 'surrogatepass').decode('utf-16')))
+            print("%d\t%s" % (num, item.encode('utf-16', 'surrogatepass').decode('utf-16')))
             self.__node[str(num)] = item
             num += 1
 
     def sub2conf(self, name, protocol):
         print("Node Selected: %s" % name.encode('utf-16', 'surrogatepass').decode('utf-16'))
         sub = self.__source[name]
+        index = -1
 
         # debug sub
         # print(sub)
@@ -78,7 +79,11 @@ class Subscribe(object):
         for c in conf["outbounds"]:
             if protocol == c["protocol"]:
                 index = conf["outbounds"].index(c)
-        
+
+        if -1 == index:
+            print("Unsupport protocol: %s" % protocol)
+            return
+
         if protocol == "vmess":
             conf["outbounds"][index]["settings"]["vnext"][-1]["address"] = sub["add"]
             conf["outbounds"][index]["settings"]["vnext"][-1]["port"] = int(sub["port"])
@@ -113,4 +118,3 @@ class Subscribe(object):
 
         os.system("killall v2ray")
         os.system("/usr/bin/v2ray/v2ray ./config.json &")
-        
